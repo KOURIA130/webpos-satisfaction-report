@@ -1,20 +1,3 @@
-Absolument \! Voici le code corrigé et amélioré.
-
-Les modifications principales sont les suivantes :
-
-1.  **Correction des Traductions** : Les traductions en portugais, roumain et bulgare étaient incomplètes ou incorrectes. Elles ont été entièrement revues pour être plus précises et naturelles. Les textes en français ont également été peaufinés pour un rendu plus professionnel.
-2.  **Correction d'un Bug Majeur (JavaScript)** : Le script JavaScript contenait une erreur critique. Il essayait d'utiliser des traductions pour les étiquettes des graphiques (ex: `translations.en.chartSatisfactionLabels`) qui n'existaient pas dans l'objet `translations`. Cela aurait empêché les graphiques de s'afficher correctement. J'ai ajouté toutes les étiquettes de graphiques manquantes pour chaque langue.
-3.  **Suppression de Code Dupliqué** : L'objet `translations` et la fonction `calculateCombinedData` étaient déclarés deux fois dans le script. Ces duplications ont été supprimées pour rendre le code propre et fonctionnel.
-4.  **Amélioration de la Logique de Traduction** : La logique pour mettre à jour le contenu en fonction du pays et de la langue a été conservée, mais elle fonctionne désormais correctement grâce aux corrections ci-dessus.
-5.  **Initialisation Corrigée** : Le code d'initialisation a été nettoyé pour s'assurer que la langue et le pays par défaut sont appliqués correctement au chargement de la page, et que tous les graphiques se mettent à jour comme prévu.
-
-Voici le code entièrement corrigé. Vous pouvez le copier-coller directement dans un fichier `.html` pour le tester.
-
------
-
-### Code Corrigé
-
-```html
 <!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
 <head>
