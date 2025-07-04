@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="pageTitle">Interactive Report: WEbpos Satisfaction Survey (Decathlon)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Content On-brand (Accent, Neutral, Quiet, Brand, Neutral, Quiet, Commercial Discount) -->
+    <!-- Application Structure Plan: La structure est un tableau de bord vertical à page unique. Elle commence par une synthèse de haut niveau (score global, points clés) pour une compréhension immédiate. Ensuite, des sections thématiques dédiées aux 'Points Forts', 'Axes d'Amélioration' et 'Recommandations Stratégiques' permettent une exploration progressive. La navigation est facilitée par une barre de navigation persistante. Cette structure a été choisie pour guider l'utilisateur d'une vue d'ensemble vers les détails spécifiques, puis vers un plan d'action clair, ce qui est plus intuitif et exploitable qu'une simple retranscription linéaire du rapport source. L'interactivité, comme les onglets pour explorer les points de friction, permet de présenter des informations denses sans surcharger l'interface. -->
+    <!-- Visualization & Content Choices: 
+        - Satisfaction Générale: Donut Chart (Chart.js/Canvas) -> Informer sur la proportion -> Hover pour détails. Choix classique et efficace pour visualiser une répartition.
+        - Comparaison des Points Forts: Bar Chart (Chart.js/Canvas) -> Comparer différentes métriques -> Hover pour détails. Permet de comparer visuellement la satisfaction sur plusieurs aspects.
+        - Priorisation des Points Faibles: Horizontal Bar Chart (Chart.js/Canvas) -> Classer les problèmes par importance -> Hover pour détails. Montre clairement la hiérarchie des problèmes à résoudre.
+        - Exploration des Points Faibles: Onglets (HTML/Tailwind/JS) -> Organiser et détailler -> Clic pour changer de vue. Évite la surcharge d'information en ne montrant que les détails pertinents sur demande.
+        - Citations Utilisateurs: Cartes de texte stylées (HTML/Tailwind) -> Apporter un contexte qualitatif. Humanise les données quantitatives.
+        - Recommandations: Colonnes avec icônes (HTML/Tailwind/Unicode) -> Organiser l'action -> Visuellement clair et direct. Sépare le plan d'action en thèmes distincts pour une meilleure lisibilité.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        /* Styles généraux du corps de page */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #E1E3F5; /* Content On-brand Quiet */
+            color: #101010; /* Content Neutral */
+        }
+        /* Styles pour le conteneur des graphiques */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 300px;
+            max-height: 400px;
+        }
+        /* Ajustement de la hauteur des graphiques pour les écrans de taille moyenne */
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        /* Styles pour les liens de navigation */
+        .nav-link {
+            transition: color 0.3s, border-bottom-color 0.3s;
+        }
+        /* Effet au survol des liens de navigation */
+        .nav-link:hover {
+            color: #7affa6; /* Content On-brand Accent */
+        }
+        /* Style du lien de navigation actif */
+        .nav-link.active {
+            color: #7affa6; /* Content On-brand Accent */
+            border-bottom-width: 2px;
+            border-bottom-color: #7affa6; /* Content On-brand Accent */
+        }
+        /* Styles pour les boutons d'onglet */
+        .tab-btn {
+            transition: background-color 0.3s, color 0.3s;
+        }
+        /* Style du bouton d'onglet actif */
+        .tab-btn.active {
+            background-color: #3643ba; /* Content Brand */
+            color: white;
+        }
+        /* Styles pour les ombres des cartes */
+        .card-shadow {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- En-tête de la page avec titre et sélecteur de langue -->
+    <header class="bg-white/80 backdrop-blur-lg sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <h1 class="text-xl md:text-2xl font-bold text-[#3643ba]" id="headerTitle">WEbpos Analysis (Decathlon)</h1>
+            <div class="flex items-center space-x-4">
+                <!-- Sélecteur de langue -->
+                <div class="relative">
+                    <select id="language-selector" class="block w-full px-3 py-1 text-base text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                        <option value="en">English</option>
+                        <option value="fr">Français</option>
+                        <option value="pt">Português</option>
+                        <option value="ro">Română</option>
+                        <option value="bg">Български</option>
+                    </select>
+                </div>
+                <!-- Menu de navigation principal -->
+                <div class="hidden md:flex space-x-6 text-sm font-medium" id="nav-menu">
+                    <a href="#summary" class="nav-link pb-1" data-translate="navSummary">Synthesis</a>
+                    <a href="#strengths" class="nav-link pb-1" data-translate="navStrengths">Strengths</a>
+                    <a href="#improvements" class="nav-link pb-1" data-translate="navImprovements">Areas for Improvement</a>
+                    <a href="#recommendations" class="nav-link pb-1" data-translate="navRecommendations">Recommendations</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Contenu principal de la page -->
+    <main class="container mx-auto px-4 py-8 md:py-12">
+
+        <!-- Section Hero (titre principal et sous-titre) -->
+        <section id="hero" class="text-center mb-16">
+            <h2 class="text-3xl md:text-5xl font-bold mb-4 text-[#3643ba]" id="heroTitle">WEbpos Satisfaction Survey (Decathlon)</h2>
+            <p class="text-lg md:text-xl text-[#616161] max-w-3xl mx-auto" id="heroSubtitle">
+                An interactive analysis of user feedback to guide our product strategy, tailored for Decathlon's sports environment.
+            </p>
+        </section>
+
+        <!-- Section Résumé (vue d'ensemble de la satisfaction) -->
+        <section id="summary" class="mb-20">
+            <h3 class="text-2xl md:text-3xl font-bold mb-2 text-center text-[#3643ba]" id="summarySectionTitle">The Situation at a Glance</h3>
+            <p class="text-center text-[#616161] mb-10 max-w-2xl mx-auto" id="summarySectionSubtitle">This section presents an overview of user satisfaction. It highlights the overall score and key insights from the survey, providing a solid foundation before diving into the details.</p>
+            <div class="grid md:grid-cols-2 gap-8 items-center">
+                <div class="bg-white p-6 rounded-lg card-shadow">
+                    <div class="chart-container max-w-sm mx-auto">
+                        <canvas id="satisfactionDonutChart"></canvas>
+                    </div>
+                </div>
+                <div class="space-y-6">
+                    <div class="bg-white p-6 rounded-lg card-shadow">
+                        <h4 class="text-xl font-bold mb-2 text-[#7affa6]" id="summaryCard1Title">✔ A Solid and Appreciated Base</h4>
+                        <p class="text-[#101010]" id="summaryCard1Text">With <span class="font-bold text-2xl">80%</span> of users satisfied or very satisfied, WEbpos effectively meets fundamental needs. Ease of use and robust reporting features are major acclaimed assets.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg card-shadow">
+                        <h4 class="text-xl font-bold mb-2 text-[#D70321]" id="summaryCard2Title">⚠ Critical Friction Points</h4>
+                        <p class="text-[#101010]" id="summaryCard2Text">However, significant operational challenges emerge. System slowness, lack of integrations, and excessively long support delays are major impediments to the efficiency and complete satisfaction of users.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section Points Forts -->
+        <section id="strengths" class="mb-20">
+            <h3 class="text-2xl md:text-3xl font-bold mb-2 text-center text-[#3643ba]" id="strengthsSectionTitle">What Our Users Like</h3>
+            <p class="text-center text-[#616161] mb-10 max-w-2xl mx-auto" id="strengthsSectionSubtitle">Here, we explore the strengths of WEbpos. Analyzing the highest-rated aspects helps us understand what constitutes our competitive advantage and what we need to preserve and strengthen in the future.</p>
+            <div class="grid md:grid-cols-5 gap-8 items-center">
+                <div class="md:col-span-3 bg-white p-6 rounded-lg card-shadow">
+                    <div class="chart-container">
+                        <canvas id="strengthsBarChart"></canvas>
+                    </div>
+                </div>
+                <div class="md:col-span-2 space-y-4">
+                    <div class="bg-white p-4 rounded-lg border-l-4 border-[#7affa6]">
+                        <h4 class="font-bold" id="strengthCard1Title">Ease of Use: 90%</h4>
+                        <blockquote class="text-sm text-[#616161] italic mt-1" id="strengthCard1Quote">"WEbpos is very intuitive and easy to get started with."</blockquote>
+                    </div>
+                     <div class="bg-white p-4 rounded-lg border-l-4 border-[#3643ba]">
+                        <h4 class="font-bold" id="strengthCard2Title">Features: 80%</h4>
+                        <blockquote class="text-sm text-[#616161] italic mt-1" id="strengthCard2Quote">"Sales reports are very detailed and useful."</blockquote>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg border-l-4 border-[#E1E3F5]">
+                        <h4 class="font-bold" id="strengthCard3Title">Value for Money: 80%</h4>
+                        <p class="text-sm text-[#616161] mt-1" id="strengthCard3Text">Perceived as a cost-effective solution by a majority of users.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section Axes d'Amélioration -->
+        <section id="improvements" class="mb-20">
+            <h3 class="text-2xl md:text-3xl font-bold mb-2 text-center text-[#3643ba]" id="improvementsSectionTitle">Priority Areas for Improvement</h3>
+            <p class="text-center text-[#616161] mb-10 max-w-2xl mx-auto" id="improvementsSectionSubtitle">This section focuses on the most significant challenges identified by our users. Understanding these friction points is essential for prioritizing our development efforts and improving the overall experience.</p>
+            <div class="grid lg:grid-cols-2 gap-8 items-start">
+                <div class="bg-white p-6 rounded-lg card-shadow">
+                    <h4 class="font-bold text-center mb-4" id="improvementsChartTitle">Ranking of Cited Problems</h4>
+                    <div class="chart-container h-64 md:h-80">
+                         <canvas id="improvementsHorizontalBarChart"></canvas>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-lg card-shadow">
+                    <h4 class="font-bold text-center mb-4" id="improvementsDetailedAnalysisTitle">Detailed Problem Analysis</h4>
+                    <div class="flex justify-center border-b mb-4">
+                        <button data-tab="performance" class="tab-btn active font-medium py-2 px-4" id="tabBtnPerformance">Performance</button>
+                        <button data-tab="integrations" class="tab-btn font-medium py-2 px-4" id="tabBtnIntegrations">Integrations</button>
+                        <button data-tab="support" class="tab-btn font-medium py-2 px-4" id="tabBtnSupport">Support</button>
+                    </div>
+                    <div id="tab-content" class="min-h-[250px]">
+                        <div id="performance-content">
+                            <h5 class="font-bold text-lg text-[#D70321]" id="performanceTabTitle">The Critical Bottleneck</h5>
+                            <p class="text-[#616161] my-2" id="performanceTabText">Slowness is the most urgent problem, directly impacting client operations during peak activity periods.</p>
+                            <ul class="list-disc list-inside space-y-1 text-sm">
+                                <li id="performanceTabLi1"><span class="font-bold">45%</span> recommend improving performance.</li>
+                                <li id="performanceTabLi2"><span class="font-bold">35%</span> cite transaction speed as a major concern.</li>
+                            </ul>
+                            <blockquote class="mt-4 p-3 bg-[#D70321]/10 border-l-4 border-[#D70321] text-[#101010] rounded-r-lg" id="performanceTabQuote">
+                                "The software is often slow, especially during peak hours, which slows down service."
+                            </blockquote>
+                        </div>
+                        <div id="integrations-content" class="hidden">
+                            <h5 class="font-bold text-lg text-[#3643ba]" id="integrationsTabTitle">The Efficiency Brake</h5>
+                            <p class="text-[#616161] my-2" id="integrationsTabText">The lack of seamless integrations forces users into manual data entry, leading to errors and wasted time.</p>
+                            <ul class="list-disc list-inside space-y-1 text-sm">
+                                <li id="integrationsTabLi1"><span class="font-bold">30%</span> request new integrations.</li>
+                                <li id="integrationsTabLi2"><span class="font-bold">25%</span> highlight difficulties connecting to other software.</li>
+                            </ul>
+                             <blockquote class="mt-4 p-3 bg-[#3643ba]/10 border-l-4 border-[#3643ba] text-[#101010] rounded-r-lg" id="integrationsTabQuote">
+                                "We had difficulties connecting WEbpos with our existing stock management system."
+                            </blockquote>
+                        </div>
+                        <div id="support-content" class="hidden">
+                            <h5 class="font-bold text-lg text-[#616161]" id="supportTabTitle">The Lack of Responsiveness</h5>
+                            <p class="text-[#616161] my-2" id="supportTabText">The issue is not the quality of the solution provided, but the waiting time to obtain it, which generates frustration and operational risk.</p>
+                            <ul class="list-disc list-inside space-y-1 text-sm">
+                                <li id="supportTabLi1"><span class="font-bold">25%</span> recommend strengthening support.</li>
+                                <li id="supportTabLi2"><span class="font-bold">10%</span> direct dissatisfaction regarding support.</li>
+                            </ul>
+                             <blockquote class="mt-4 p-3 bg-[#616161]/10 border-l-4 border-[#616161] text-[#101010] rounded-r-lg" id="supportTabQuote">
+                                "Support response time is sometimes too long."
+                            </blockquote>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section Recommandations Stratégiques -->
+        <section id="recommendations" class="mb-20">
+            <h3 class="text-2xl md:text-3xl font-bold mb-2 text-center text-[#3643ba]" id="recommendationsSectionTitle">Strategic Recommendations</h3>
+            <p class="text-center text-[#616161] mb-10 max-w-2xl mx-auto" id="recommendationsSectionSubtitle">Based on this analysis, here are the three priority action areas for our roadmap. Each recommendation aims to transform an identified weakness into a strength, thereby improving the overall value of WEbpos.</p>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="bg-white p-6 rounded-lg card-shadow text-center">
+                    <div class="text-4xl mb-4 text-[#7affa6]">⚡</div> <!-- Icône pour la performance/vitesse -->
+                    <h4 class="text-xl font-bold mb-3" id="recCard1Title">#1. Optimize Performance</h4>
+                    <ul class="text-left list-disc list-inside text-[#101010] space-y-2">
+                        <li id="recCard1Li1">Conduct a comprehensive performance audit (code, DB, infra).</li>
+                        <li id="recCard1Li2">Focus efforts on managing peak activity.</li>
+                        <li id="recCard1Li3">Communicate transparently on ongoing improvements.</li>
+                    </ul>
+                </div>
+                <div class="bg-white p-6 rounded-lg card-shadow text-center">
+                    <div class="text-4xl mb-4 text-[#3643ba]">🤝</div> <!-- Icône pour les intégrations/partenariats -->
+                    <h4 class="text-xl font-bold mb-3" id="recCard2Title">#2. Extend Integrations</h4>
+                    <ul class="text-left list-disc list-inside text-[#101010] space-y-2">
+                        <li id="recCard2Li1">Identify the most requested integrations (stock, accounting, CRM).</li>
+                        <li id="recCard2Li2">Develop robust APIs and "plug-and-play" connectors.</li>
+                        <li id="recCard2Li3">Provide clear documentation and dedicated support.</li>
+                    </ul>
+                </div>
+                 <div class="bg-white p-6 rounded-lg card-shadow text-center">
+                    <div class="text-4xl mb-4 text-[#616161]">📣</div> <!-- Icône pour le support/communication -->
+                    <h4 class="text-xl font-bold mb-3" id="recCard3Title">#3. Strengthen Support</h4>
+                    <ul class="text-left list-disc list-inside text-[#101010] space-y-2">
+                        <li id="recCard3Li1">Improve response times via better SLAs.</li>
+                        <li id="recCard3Li2">Develop support options (chat, knowledge base).</li>
+                        <li id="recCard3Li3">Increase resources during critical hours.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Pied de page -->
+    <footer class="mt-20 border-t py-6">
+        <p class="text-center text-sm text-[#616161]" id="footerText">Interactive WEbpos Report &copy; 2025 (Decathlon)</p>
+    </footer>
+
+    <script>
+        // Déclaration des instances de graphique pour pouvoir les manipuler
+        let satisfactionDonutChartInstance;
+        let strengthsBarChartInstance;
+        let improvementsHorizontalBarChartInstance;
+
+        // Définition des couleurs des graphiques basées sur la palette fournie
+        const chartColors = {
+            verySatisfied: '#7affa6',    /* Content On-brand Accent */
+            satisfied: '#3643ba',     /* Content Brand */
+            neutral: '#E1E3F5',       /* Content On-brand Quiet */
+            dissatisfied: '#D70321',  /* Content Commercial Discount */
+            performance: '#D70321',   /* Content Commercial Discount */
+            integrations: '#3643ba',  /* Content Brand */
+            support: '#616161'        /* Content Quiet */
+        };
+
+        // Objet de traduction pour toutes les langues supportées
+        const translations = {
+            en: {
+                pageTitle: "Interactive Report: WEbpos Satisfaction Survey (Decathlon)",
+                headerTitle: "WEbpos Analysis (Decathlon)",
+                navSummary: "Synthesis",
+                navStrengths: "Strengths",
+                navImprovements: "Areas for Improvement",
+                navRecommendations: "Recommendations",
+                heroTitle: "WEbpos Satisfaction Survey (Decathlon)",
+                heroSubtitle: "An interactive analysis of user feedback to guide our product strategy, tailored for Decathlon's sports environment.",
+                summarySectionTitle: "The Situation at a Glance",
+                summarySectionSubtitle: "This section presents an overview of user satisfaction. It highlights the overall score and key insights from the survey, providing a solid foundation before diving into the details.",
+                summaryCard1Title: "✔ A Solid and Appreciated Base",
+                summaryCard1Text: "With <span class=\"font-bold text-2xl\">80%</span> of users satisfied or very satisfied, WEbpos effectively meets fundamental needs. Ease of use and robust reporting features are major acclaimed assets.",
+                summaryCard2Title: "⚠ Critical Friction Points",
+                summaryCard2Text: "However, significant operational challenges emerge. System slowness, lack of integrations, and excessively long support delays are major impediments to the efficiency and complete satisfaction of users.",
+                strengthsSectionTitle: "What Our Users Like",
+                strengthsSectionSubtitle: "Here, we explore the strengths of WEbpos. Analyzing the highest-rated aspects helps us understand what constitutes our competitive advantage and what we need to preserve and strengthen in the future.",
+                strengthCard1Title: "Ease of Use: 90%",
+                strengthCard1Quote: "\"WEbpos is very intuitive and easy to get started with.\"",
+                strengthCard2Title: "Features: 80%",
+                strengthCard2Quote: "\"Sales reports are very detailed and useful.\"",
+                strengthCard3Title: "Value for Money: 80%",
+                strengthCard3Text: "Perceived as a cost-effective solution by a majority of users.",
+                improvementsSectionTitle: "Priority Areas for Improvement",
+                improvementsSectionSubtitle: "This section focuses on the most significant challenges identified by our users. Understanding these friction points is essential for prioritizing our development efforts and improving the overall experience.",
+                improvementsChartTitle: "Ranking of Cited Problems",
+                improvementsDetailedAnalysisTitle: "Detailed Problem Analysis",
+                tabBtnPerformance: "Performance",
+                tabBtnIntegrations: "Integrations",
+                tabBtnSupport: "Support",
+                performanceTabTitle: "The Critical Bottleneck",
+                performanceTabText: "Slowness is the most urgent problem, directly impacting client operations during peak activity periods.",
+                performanceTabLi1: "<span class=\"font-bold\">45%</span> recommend improving performance.",
+                performanceTabLi2: "<span class=\"font-bold\">35%</span> cite transaction speed as a major concern.",
+                performanceTabQuote: "\"The software is often slow, especially during peak hours, which slows down service.\"",
+                integrationsTabTitle: "The Efficiency Brake",
+                integrationsTabText: "The lack of seamless integrations forces users into manual data entry, leading to errors and wasted time.",
+                integrationsTabLi1: "<span class=\"font-bold\">30%</span> request new integrations.",
+                integrationsTabLi2: "<span class=\"font-bold\">25%</span> highlight difficulties connecting to other software.",
+                integrationsTabQuote: "\"We had difficulties connecting WEbpos with our existing stock management system.\"",
+                supportTabTitle: "The Lack of Responsiveness",
+                supportTabText: "The issue is not the quality of the solution provided, but the waiting time to obtain it, which generates frustration and operational risk.",
+                supportTabLi1: "<span class=\"font-bold\">25%</span> recommend strengthening support.",
+                supportTabLi2: "<span class=\"font-bold\">10%</span> direct dissatisfaction regarding support.",
+                supportTabQuote: "\"Support response time is sometimes too long.\"",
+                recommendationsSectionTitle: "Strategic Recommendations",
+                recommendationsSectionSubtitle: "Based on this analysis, here are the three priority action areas for our roadmap. Each recommendation aims to transform an identified weakness into a strength, thereby improving the overall value of WEbpos.",
+                recCard1Title: "#1. Optimize Performance",
+                recCard1Li1: "Conduct a comprehensive performance audit (code, DB, infra).",
+                recCard1Li2: "Focus efforts on managing peak activity.",
+                recCard1Li3: "Communicate transparently on ongoing improvements.",
+                recCard2Title: "#2. Extend Integrations",
+                recCard2Li1: "Identify the most requested integrations (stock, accounting, CRM).",
+                recCard2Li2: "Develop robust APIs and \"plug-and-play\" connectors.",
+                recCard2Li3: "Provide clear documentation and dedicated support.",
+                recCard3Title: "#3. Strengthen Support",
+                recCard3Li1: "Improve response times via better SLAs.",
+                recCard3Li2: "Develop support options (chat, knowledge base).",
+                recCard3Li3: "Increase resources during critical hours.",
+                footerText: "Interactive WEbpos Report &copy; 2025 (Decathlon)",
+                chartSatisfactionLabels: ['Very satisfied', 'Satisfied', 'Neutral', 'Dissatisfied'],
+                chartStrengthsLabels: ['Very satisfied', 'Satisfied', 'Neutral', 'Dissatisfied'],
+                chartStrengthsDataset1Label: 'Ease of Use',
+                chartStrengthsDataset2Label: 'Features',
+                chartStrengthsDataset3Label: 'Value for Money',
+                chartImprovementsLabels: ['Improve performance', 'Develop integrations', 'Strengthen support'],
+                chartImprovementsDatasetLabel: '% of respondents recommending'
+            },
+            fr: {
+                pageTitle: "Rapport Interactif : Enquête de Satisfaction WEbpos (Decathlon)",
+                headerTitle: "Analyse WEbpos (Decathlon)",
+                navSummary: "Synthèse",
+                navStrengths: "Points Forts",
+                navImprovements: "Axes d'Amélioration",
+                navRecommendations: "Recommandations",
+                heroTitle: "Enquête de Satisfaction WEbpos (Decathlon)",
+                heroSubtitle: "Une analyse interactive des retours utilisateurs pour guider notre stratégie produit, adaptée à l'environnement sportif de Decathlon.",
+                summarySectionTitle: "La Situation en un Clin d'Œil",
+                summarySectionSubtitle: "Cette section présente la vue d'ensemble de la satisfaction des utilisateurs. Elle met en lumière le score global et les principaux enseignements de l'enquête, offrant une base solide avant de plonger dans les détails.",
+                summaryCard1Title: "✔ Une Base Solide et Appréciée",
+                summaryCard1Text: "Avec <span class=\"font-bold text-2xl\">80%</span> d'utilisateurs satisfaits ou très satisfaits, WEbpos répond efficacement aux besoins fondamentaux. La facilité d'utilisation et les fonctionnalités de reporting sont des atouts majeurs plébiscités.",
+                summaryCard2Title: "⚠ Des Points de Friction Critiques",
+                summaryCard2Text: "Cependant, des défis opérationnels importants émergent. La lenteur du système, le manque d'intégrations et des délais de support trop longs sont des freins majeurs à l'efficacité et à la satisfaction complète des utilisateurs.",
+                strengthsSectionTitle: "Ce que Nos Utilisateurs Aiment",
+                strengthsSectionSubtitle: "Ici, nous explorons les points forts de WEbpos. L'analyse des aspects les mieux notés nous aide à comprendre ce qui constitue notre avantage concurrentiel et ce que nous devons préserver et renforcer à l'avenir.",
+                strengthCard1Title: "Facilité d'Utilisation : 90%",
+                strengthCard1Quote: "\"WEbpos est très intuitif et facile à prendre en main.\"",
+                strengthCard2Title: "Fonctionnalités : 80%",
+                strengthCard2Quote: "\"Les rapports de vente sont très détaillés et utiles.\"",
+                strengthCard3Title: "Rapport Qualité-Prix : 80%",
+                strengthCard3Text: "Perçu comme une solution rentable par une majorité d'utilisateurs.",
+                improvementsSectionTitle: "Axes d'Amélioration Prioritaires",
+                improvementsSectionSubtitle: "Cette section se concentre sur les défis les plus importants identifiés par nos utilisateurs. Comprendre ces points de friction est essentiel pour prioriser nos efforts de développement et améliorer l'expérience globale.",
+                improvementsChartTitle: "Classement des Problèmes Cités",
+                improvementsDetailedAnalysisTitle: "Analyse Détaillée des Problèmes",
+                tabBtnPerformance: "Performance",
+                tabBtnIntegrations: "Intégrations",
+                tabBtnSupport: "Support",
+                performanceTabTitle: "Le Goulot d'Étranglement Critique",
+                performanceTabText: "La lenteur est le problème le plus urgent, impactant directement les opérations des clients pendant les périodes de forte activité.",
+                performanceTabLi1: "<span class=\"font-bold\">45%</span> recommandent d'améliorer la performance.",
+                performanceTabLi2: "<span class=\"font-bold\">35%</span> citent la vitesse de transaction comme une préoccupation.",
+                performanceTabQuote: "\"Le logiciel est souvent lent, surtout aux heures de pointe, ce qui ralentit le service.\"",
+                integrationsTabTitle: "Le Frein à l'Efficacité",
+                integrationsTabText: "Le manque d'intégrations fluides force les utilisateurs à des saisies manuelles, sources d'erreurs et de perte de temps.",
+                integrationsTabLi1: "<span class=\"font-bold\">30%</span> demandent de nouvelles intégrations.",
+                integrationsTabLi2: "<span class=\"font-bold\">25%</span> soulignent les difficultés de connexion à d'autres logiciels.",
+                integrationsTabQuote: "\"Nous avons eu des difficultés à connecter WEbpos avec notre système de gestion de stock existant.\"",
+                supportTabTitle: "Le Manque de Réactivité",
+                supportTabText: "Le problème n'est pas la qualité de la solution apportée, mais le temps d'attente pour l'obtenir, ce qui génère de la frustration et un risque opérationnel.",
+                supportTabLi1: "<span class=\"font-bold\">25%</span> recommandent de renforcer le support.",
+                supportTabLi2: "<span class=\"font-bold\">10%</span> d'insatisfaction directe concernant le support.",
+                supportTabQuote: "\"Le temps de réponse du support client est parfois trop long.\"",
+                recommendationsSectionTitle: "Recommandations Stratégiques",
+                recommendationsSectionSubtitle: "Sur la base de cette analyse, voici les trois axes d'action prioritaires pour notre feuille de route. Chaque recommandation vise à transformer un point faible identifié en une force, afin d'améliorer la valeur globale de WEbpos.",
+                recCard1Title: "#1. Optimiser la Performance",
+                recCard1Li1: "Lancer un audit de performance complet (code, BDD, infra).",
+                recCard1Li2: "Focaliser les efforts sur la gestion des pics d'activité.",
+                recCard1Li3: "Communiquer de manière transparente sur les améliorations.",
+                recCard2Title: "#2. Étendre les Intégrations",
+                recCard2Li1: "Identifier les intégrations les plus demandées (stock, compta, CRM).",
+                recCard2Li2: "Développer des API robustes et des connecteurs \"plug-and-play\".",
+                recCard2Li3: "Fournir une documentation claire et un support dédié.",
+                recCard3Title: "#3. Renforcer le Support",
+                recCard3Li1: "Améliorer les temps de réponse via de meilleurs SLA.",
+                recCard3Li2: "Développer les options de support (chat, base de connaissances).",
+                recCard3Li3: "Augmenter les ressources aux heures critiques.",
+                footerText: "Rapport Interactif WEbpos &copy; 2025 (Decathlon)",
+                chartSatisfactionLabels: ['Très satisfait', 'Satisfait', 'Neutre', 'Insatisfait'],
+                chartStrengthsLabels: ['Très satisfait', 'Satisfait', 'Neutre', 'Insatisfait'],
+                chartStrengthsDataset1Label: 'Facilité d\'utilisation',
+                chartStrengthsDataset2Label: 'Fonctionnalités',
+                chartStrengthsDataset3Label: 'Rapport Qualité-Prix',
+                chartImprovementsLabels: ['Améliorer performance', 'Développer intégrations', 'Renforcer support'],
+                chartImprovementsDatasetLabel: '% de répondants recommandant'
+            },
+            pt: {
+                pageTitle: "Relatório Interativo: Pesquisa de Satisfação WEbpos (Decathlon)",
+                headerTitle: "Análise WEbpos (Decathlon)",
+                navSummary: "Síntese",
+                navStrengths: "Pontos Fortes",
+                navImprovements: "Áreas de Melhoria",
+                navRecommendations: "Recomendações",
+                heroTitle: "Pesquisa de Satisfação WEbpos (Decathlon)",
+                heroSubtitle: "Uma análise interativa do feedback dos usuários para guiar nossa estratégia de produto, adaptada ao ambiente esportivo da Decathlon.",
+                summarySectionTitle: "A Situação em Resumo",
+                summarySectionSubtitle: "Esta seção apresenta uma visão geral da satisfação do usuário. Destaca a pontuação geral e os principais insights da pesquisa, fornecendo uma base sólida antes de aprofundar nos detalhes.",
+                summaryCard1Title: "✔ Uma Base Sólida e Apreciada",
+                summaryCard1Text: "Com <span class=\"font-bold text-2xl\">80%</span> dos usuários satisfeitos ou muito satisfeitos, o WEbpos atende eficazmente às necessidades fundamentais. A facilidade de uso e os recursos robustos de relatórios são grandes ativos aclamados.",
+                summaryCard2Title: "⚠ Pontos Críticos de Atrito",
+                summaryCard2Text: "No entanto, surgem desafios operacionais significativos. A lentidão do sistema, a falta de integrações e os atrasos excessivos no suporte são grandes impedimentos à eficiência e à satisfação completa dos usuários.",
+                strengthsSectionTitle: "O Que Nossos Usuários Gostam",
+                strengthsSectionSubtitle: "Aqui, exploramos os pontos fortes do WEbpos. Analisar os aspectos mais bem avaliados nos ajuda a entender o que constitui nossa vantagem competitiva e o que precisamos preservar e fortalecer no futuro.",
+                strengthCard1Title: "Facilidade de Uso: 90%",
+                strengthCard1Quote: "\"O WEbpos é muito intuitivo e fácil de começar a usar.\"",
+                strengthCard2Title: "Funcionalidades: 80%",
+                strengthCard2Quote: "\"Os relatórios de vendas são muito detalhados e úteis.\"",
+                strengthCard3Title: "Custo-Benefício: 80%",
+                strengthCard3Text: "Percebido como uma solução econômica pela maioria dos usuários.",
+                improvementsSectionTitle: "Áreas Prioritárias para Melhoria",
+                improvementsSectionSubtitle: "Esta seção foca nos desafios mais significativos identificados por nossos usuários. Compreender esses pontos de atrito é essencial para priorizar nossos esforços de desenvolvimento e melhorar a experiência geral.",
+                improvementsChartTitle: "Classificação dos Problemas Citados",
+                improvementsDetailedAnalysisTitle: "Análise Detalhada do Problema",
+                tabBtnPerformance: "Desempenho",
+                tabBtnIntegrations: "Integrações",
+                tabBtnSupport: "Suporte",
+                performanceTabTitle: "O Gargalo Crítico",
+                performanceTabText: "A lentidão é o problema mais urgente, impactando diretamente as operações dos clientes durante os períodos de pico de atividade.",
+                performanceTabLi1: "<span class=\"font-bold\">45%</span> recomendam melhorar o desempenho.",
+                performanceTabLi2: "<span class=\"font-bold\">35%</span> citam a velocidade da transação como uma grande preocupação.",
+                performanceTabQuote: "\"O software é frequentemente lento, especialmente durante o horário de pico, o que atrasa o serviço.\"",
+                integrationsTabTitle: "O Freio da Eficiência",
+                integrationsTabText: "A falta de integrações contínuas força os usuários à entrada manual de dados, levando a erros e perda de tempo.",
+                integrationsTabLi1: "<span class=\"font-bold\">30%</span> solicitam novas integrações.",
+                integrationsTabLi2: "<span class=\"font-bold\">25%</span> destacam dificuldades na conexão com outros softwares.",
+                integrationsTabQuote: "\"Tivemos dificuldades em conectar o WEbpos com nosso sistema de gestão de estoque existente.\"",
+                supportTabTitle: "A Falta de Responsividade",
+                supportTabText: "A questão não é a qualidade da solução fornecida, mas o tempo de espera para obtê-la, o que gera frustração e risco operacional.",
+                supportTabLi1: "<span class=\"font-bold\">25%</span> recomendam fortalecer o suporte.",
+                supportTabLi2: "<span class=\"font-bold\">10%</span> de insatisfação direta em relação ao suporte.",
+                supportTabQuote: "\"O tempo de resposta do suporte é às vezes muito longo.\"",
+                recommendationsSectionTitle: "Recomendações Estratégicas",
+                recommendationsSectionSubtitle: "Com base nesta análise, aqui estão as três áreas de ação prioritárias para nosso roteiro. Cada recomendação visa transformar uma fraqueza identificada em uma força, melhorando assim o valor geral do WEbpos.",
+                recCard1Title: "#1. Otimizar Desempenho",
+                recCard1Li1: "Realizar uma auditoria de desempenho abrangente (código, BD, infra).",
+                recCard1Li2: "Focar os esforços no gerenciamento de picos de atividade.",
+                recCard1Li3: "Comunicar de forma transparente sobre as melhorias em andamento.",
+                recCard2Title: "#2. Estender Integrações",
+                recCard2Li1: "Identificar as integrações mais solicitadas (estoque, contabilidade, CRM).",
+                recCard2Li2: "Desenvolver APIs robustas e conectores \"plug-and-play\".",
+                recCard2Li3: "Fornecer documentação clara e suporte dedicado.",
+                recCard3Title: "#3. Fortalecer o Suporte",
+                recCard3Li1: "Melhorar os tempos de resposta através de SLAs melhores.",
+                recCard3Li2: "Desenvolver opções de suporte (chat, base de conhecimento).",
+                recCard3Li3: "Aumentar os recursos durante horários críticos.",
+                footerText: "Relatório Interativo WEbpos &copy; 2025 (Decathlon)",
+                chartSatisfactionLabels: ['Muito satisfeito', 'Satisfeito', 'Neutro', 'Insatisfeito'],
+                chartStrengthsLabels: ['Muito satisfeito', 'Satisfeito', 'Neutro', 'Insatisfeito'],
+                chartStrengthsDataset1Label: 'Facilidade de Uso',
+                chartStrengthsDataset2Label: 'Funcionalidades',
+                chartStrengthsDataset3Label: 'Custo-Benefício',
+                chartImprovementsLabels: ['Melhorar desempenho', 'Desenvolver integrações', 'Fortalecer suporte'],
+                chartImprovementsDatasetLabel: '% de respondentes recomendando'
+            },
+            ro: {
+                pageTitle: "Raport Interactiv: Sondaj de Satisfacție WEbpos (Decathlon)",
+                headerTitle: "Analiză WEbpos (Decathlon)",
+                navSummary: "Sinteză",
+                navStrengths: "Puncte Forte",
+                navImprovements: "Arii de Îmbunătățire",
+                navRecommendations: "Recomandări",
+                heroTitle: "Sondaj de Satisfacție WEbpos (Decathlon)",
+                heroSubtitle: "O analiză interactivă a feedback-ului utilizatorilor pentru a ghida strategia noastră de produs, adaptată mediului sportiv al Decathlon.",
+                summarySectionTitle: "Situația dintr-o Privire",
+                summarySectionSubtitle: "Această secțiune prezintă o imagine de ansamblu a satisfacției utilizatorilor. Evidențiază scorul general și principalele concluzii ale sondajului, oferind o bază solidă înainte de a aprofunda detaliile.",
+                summaryCard1Title: "✔ O Bază Solidă și Apreciată",
+                summaryCard1Text: "Cu <span class=\"font-bold text-2xl\">80%</span> dintre utilizatori satisfăcuți sau foarte satisfăcuți, WEbpos îndeplinește eficient nevoile fundamentale. Ușurința în utilizare și funcțiile robuste de raportare sunt active majore aclamate.",
+                summaryCard2Title: "⚠ Puncte Critice de Fricțiune",
+                summaryCard2Text: "Cu toate acestea, apar provocări operaționale semnificative. Lentoarea sistemului, lipsa integrărilor și întârzierile excesive ale suportului sunt impedimente majore pentru eficiența și satisfacția completă a utilizatorilor.",
+                strengthsSectionTitle: "Ce Le Place Utilizatorilor Noștri",
+                strengthsSectionSubtitle: "Aici, explorăm punctele forte ale WEbpos. Analizarea aspectelor cel mai bine cotate ne ajută să înțelegem ce constituie avantajul nostru competitiv și ce trebuie să păstrăm și să consolidăm în viitor.",
+                strengthCard1Title: "Ușurință în Utilizare: 90%",
+                strengthCard1Quote: "\"WEbpos este foarte intuitiv și ușor de utilizat.\"",
+                strengthCard2Title: "Funcționalități: 80%",
+                strengthCard2Quote: "\"Rapoartele de vânzări sunt foarte detaliate și utile.\"",
+                strengthCard3Title: "Raport Calitate-Preț: 80%",
+                strengthCard3Text: "Perceput ca o soluție rentabilă de majoritatea utilizatorilor.",
+                improvementsSectionTitle: "Arii Prioritare pentru Îmbunătățire",
+                improvementsSectionSubtitle: "Această secțiune se concentrează pe cele mai semnificative provocări identificate de utilizatorii noștri. Înțelegerea acestor puncte de fricțiune este esențială pentru prioritizarea eforturilor noastre de dezvoltare și îmbunătățirea experienței generale.",
+                improvementsChartTitle: "Clasificarea Problemelor Citate",
+                improvementsDetailedAnalysisTitle: "Analiza Detaliată a Problemei",
+                tabBtnPerformance: "Performanță",
+                tabBtnIntegrations: "Integrări",
+                tabBtnSupport: "Suport",
+                performanceTabTitle: "Blocajul Critic",
+                performanceTabText: "Lentoarea este problema cea mai urgentă, impactând direct operațiunile clienților în perioadele de vârf de activitate.",
+                performanceTabLi1: "<span class=\"font-bold\">45%</span> recomandă îmbunătățirea performanței.",
+                performanceTabLi2: "<span class=\"font-bold\">35%</span> citează viteza tranzacțiilor ca o preocupare majoră.",
+                performanceTabQuote: "\"Software-ul este adesea lent, mai ales în orele de vârf, ceea ce încetinește serviciul.\"",
+                integrationsTabTitle: "Frâna Eficienței",
+                integrationsTabText: "Lipsa integrărilor fluide forțează utilizatorii la introducerea manuală a datelor, ducând la erori și timp pierdut.",
+                integrationsTabLi1: "<span class=\"font-bold\">30%</span> solicită noi integrări.",
+                integrationsTabLi2: "<span class=\"font-bold\">25%</span> evidențiază dificultăți la conectarea cu alte programe.",
+                integrationsTabQuote: "\"Am avut dificultăți în conectarea WEbpos cu sistemul nostru existent de gestionare a stocurilor.\"",
+                supportTabTitle: "Lipsa de Responsivitate",
+                supportTabText: "Problema nu este calitatea soluției oferite, ci timpul de așteptare pentru a o obține, ceea ce generează frustrare și risc operațional.",
+                supportTabLi1: "<span class=\"font-bold\">25%</span> recomandă consolidarea suportului.",
+                supportTabLi2: "<span class=\"font-bold\">10%</span> insatisfacție directă privind suportul.",
+                supportTabQuote: "\"Timpul de răspuns al suportului este uneori prea lung.\"",
+                recommendationsSectionTitle: "Recomandări Strategice",
+                recommendationsSectionSubtitle: "Pe baza acestei analize, iată cele trei domenii de acțiune prioritare pentru foaia noastră de parcurs. Fiecare recomandare își propune să transforme o slăbiciune identificată într-o forță, îmbunătățind astfel valoarea generală a WEbpos.",
+                recCard1Title: "#1. Optimizarea Performanței",
+                recCard1Li1: "Efectuarea unui audit complet de performanță (cod, BD, infrastructură).",
+                recCard1Li2: "Concentrarea eforturilor pe gestionarea vârfurilor de activitate.",
+                recCard1Li3: "Comunicarea transparentă privind îmbunătățirile în curs.",
+                recCard2Title: "#2. Extinderea Integrărilor",
+                recCard2Li1: "Identificarea celor mai solicitate integrări (stoc, contabilitate, CRM).",
+                recCard2Li2: "Dezvoltarea de API-uri robuste și conectori \"plug-and-play\".",
+                recCard2Li3: "Furnizarea de documentație clară și suport dedicat.",
+                recCard3Title: "#3. Consolidarea Suportului",
+                recCard3Li1: "Îmbunătățirea timpilor de răspuns prin SLA-uri mai bune.",
+                recCard3Li2: "Dezvoltarea opțiunilor de suport (chat, bază de cunoștințe).",
+                recCard3Li3: "Creșterea resurselor în orele critice.",
+                footerText: "Raport Interactiv WEbpos &copy; 2025 (Decathlon)",
+                chartSatisfactionLabels: ['Foarte satisfăcut', 'Satisfăcut', 'Neutru', 'Nesatisfăcut'],
+                chartStrengthsLabels: ['Foarte satisfăcut', 'Satisfăcut', 'Neutru', 'Nesatisfăcut'],
+                chartStrengthsDataset1Label: 'Ușurință în Utilizare',
+                chartStrengthsDataset2Label: 'Funcționalități',
+                chartStrengthsDataset3Label: 'Raport Calitate-Preț',
+                chartImprovementsLabels: ['Îmbunătățire performanță', 'Dezvoltare integrări', 'Consolidare suport'],
+                chartImprovementsDatasetLabel: '% de respondenți care recomandă'
+            },
+            bg: {
+                pageTitle: "Интерактивен доклад: Проучване на удовлетвореността от WEbpos (Decathlon)",
+                headerTitle: "Анализ на WEbpos (Decathlon)",
+                navSummary: "Резюме",
+                navStrengths: "Силни страни",
+                navImprovements: "Области за подобрение",
+                navRecommendations: "Препоръки",
+                heroTitle: "Проучване на удовлетвореността от WEbpos (Decathlon)",
+                heroSubtitle: "Интерактивен анализ на обратната връзка от потребителите, за да насочим нашата продуктова стратегия, адаптирана към спортната среда на Decathlon.",
+                summarySectionTitle: "Ситуацията с един поглед",
+                summarySectionSubtitle: "Този раздел представя общ преглед на удовлетвореността на потребителите. Той подчертава общия резултат и ключовите прозрения от проучването, осигурявайки солидна основа, преди да се потопим в детайлите.",
+                summaryCard1Title: "✔ Солидна и ценена основа",
+                summaryCard1Text: "С <span class=\"font-bold text-2xl\">80%</span> от доволните или много доволни потребители, WEbpos ефективно отговаря на основните нужди. Лесната употреба и надеждните функции за отчитане са основни признати предимства.",
+                summaryCard2Title: "⚠ Критични точки на триене",
+                summaryCard2Text: "Въпреки това възникват значителни оперативни предизвикателства. Бавността на системата, липсата на интеграции и прекомерно дългите забавяния на поддръжката са основни пречки за ефективността и пълното удовлетворение на потребителите.",
+                strengthsSectionTitle: "Какво харесват нашите потребители",
+                strengthsSectionSubtitle: "Тук изследваме силните страни на WEbpos. Анализът на най-високо оценените аспекти ни помага да разберем какво представлява нашето конкурентно предимство и какво трябва да запазим и засилим в бъдеще.",
+                strengthCard1Title: "Лесна употреба: 90%",
+                strengthCard1Quote: "\"WEbpos е много интуитивен и лесен за започване.\"",
+                strengthCard2Title: "Функции: 80%",
+                strengthCard2Quote: "\"Отчетите за продажби са много подробни и полезни.\"",
+                strengthCard3Title: "Съотношение цена-качество: 80%",
+                strengthCard3Text: "Възприемано като рентабилно решение от мнозинството потребители.",
+                improvementsSectionTitle: "Приоритетни области за подобрение",
+                improvementsSectionSubtitle: "Този раздел се фокусира върху най-значимите предизвикателства, идентифицирани от нашите потребители. Разбирането на тези точки на триене е от съществено значение за приоритизиране на нашите усилия за развитие и подобряване на цялостното преживяване.",
+                improvementsChartTitle: "Класиране на цитираните проблеми",
+                improvementsDetailedAnalysisTitle: "Подробен анализ на проблема",
+                tabBtnPerformance: "Производителност",
+                tabBtnIntegrations: "Интеграции",
+                tabBtnSupport: "Поддръжка",
+                performanceTabTitle: "Критичното тясно място",
+                performanceTabText: "Бавността е най-спешният проблем, засягащ пряко операциите на клиентите по време на пиковите периоди на активност.",
+                performanceTabLi1: "<span class=\"font-bold\">45%</span> препоръчват подобряване на производителността.",
+                performanceTabLi2: "<span class=\"font-bold\">35%</span> посочват скоростта на транзакциите като основна грижа.",
+                performanceTabQuote: "\"Софтуерът често е бавен, особено в пиковите часове, което забавя обслужването.\"",
+                integrationsTabTitle: "Спирачката на ефективността",
+                integrationsTabText: "Липсата на безпроблемни интеграции принуждава потребителите да въвеждат данни ръчно, което води до грешки и загуба на време.",
+                integrationsTabLi1: "<span class=\"font-bold\">30%</span> изискват нови интеграции.",
+                integrationsTabLi2: "<span class=\"font-bold\">25%</span> подчертават трудностите при свързване с друг софтуер.",
+                integrationsTabQuote: "\"Имахме затруднения при свързването на WEbpos с нашата съществуваща система за управление на запасите.\"",
+                supportTabTitle: "Липсата на отзивчивост",
+                supportTabText: "Проблемът не е в качеството на предоставеното решение, а във времето за изчакване, за да го получите, което генерира разочарование и оперативен риск.",
+                supportTabLi1: "<span class=\"font-bold\">25%</span> препоръчват засилване на поддръжката.",
+                supportTabLi2: "<span class=\"font-bold\">10%</span> пряко недоволство относно поддръжката.",
+                supportTabQuote: "\"Времето за отговор на поддръжката понякога е твърде дълго.\"",
+                recommendationsSectionTitle: "Стратегически препоръки",
+                recommendationsSectionSubtitle: "Въз основа на този анализ, ето трите приоритетни области за действие за нашата пътна карта. Всяка препоръка има за цел да превърне идентифицираната слабост в сила, като по този начин подобри цялостната стойност на WEbpos.",
+                recCard1Title: "#1. Оптимизиране на производителността",
+                recCard1Li1: "Извършване на цялостен одит на производителността (код, БД, инфраструктура).",
+                recCard1Li2: "Фокусиране на усилията върху управлението на пиковите натоварвания.",
+                recCard1Li3: "Прозрачна комуникация относно текущите подобрения.",
+                recCard2Title: "#2. Разширяване на интеграциите",
+                recCard2Li1: "Идентифициране на най-търсените интеграции (склад, счетоводство, CRM).",
+                recCard2Li2: "Разработване на надеждни API и \"plug-and-play\" конектори.",
+                recCard2Li3: "Предоставяне на ясна документация и специализирана поддръжка.",
+                recCard3Title: "#3. Засилване на поддръжката",
+                recCard3Li1: "Подобряване на времето за отговор чрез по-добри SLA.",
+                recCard3Li2: "Развиване на опции за поддръжка (чат, база знания).",
+                recCard3Li3: "Увеличаване на ресурсите през критичните часове.",
+                footerText: "Интерактивен доклад на WEbpos &copy; 2025 (Decathlon)",
+                chartSatisfactionLabels: ['Много доволни', 'Доволни', 'Неутрални', 'Недоволни'],
+                chartStrengthsLabels: ['Много доволни', 'Доволни', 'Неутрални', 'Недоволни'],
+                chartStrengthsDataset1Label: 'Лесна употреба',
+                chartStrengthsDataset2Label: 'Функции',
+                chartStrengthsDataset3Label: 'Съотношение цена-качество',
+                chartImprovementsLabels: ['Подобряване на производителността', 'Развиване на интеграции', 'Засилване на поддръжката'],
+                chartImprovementsDatasetLabel: '% от респондентите, които препоръчват'
+            }
+        };
+
+        // Fonction pour mettre à jour les étiquettes des graphiques en fonction de la langue
+        function updateChartLabels(lang) {
+            if (satisfactionDonutChartInstance) {
+                satisfactionDonutChartInstance.data.labels = translations[lang].chartSatisfactionLabels;
+                satisfactionDonutChartInstance.update();
+            }
+            if (strengthsBarChartInstance) {
+                strengthsBarChartInstance.data.labels = translations[lang].chartStrengthsLabels;
+                strengthsBarChartInstance.data.datasets[0].label = translations[lang].chartStrengthsDataset1Label;
+                strengthsBarChartInstance.data.datasets[1].label = translations[lang].chartStrengthsDataset2Label;
+                strengthsBarChartInstance.data.datasets[2].label = translations[lang].chartStrengthsDataset3Label;
+                strengthsBarChartInstance.update();
+            }
+            if (improvementsHorizontalBarChartInstance) {
+                improvementsHorizontalBarChartInstance.data.labels = translations[lang].chartImprovementsLabels;
+                improvementsHorizontalBarChartInstance.data.datasets[0].label = translations[lang].chartImprovementsDatasetLabel;
+                improvementsHorizontalBarChartInstance.update();
+            }
+        }
+
+        // Fonction principale pour traduire le contenu de la page
+        function translatePage(lang) {
+            const elementsToTranslate = {
+                pageTitle: 'id',
+                headerTitle: 'id',
+                navSummary: 'data-translate',
+                navStrengths: 'data-translate',
+                navImprovements: 'data-translate',
+                navRecommendations: 'data-translate',
+                heroTitle: 'id',
+                heroSubtitle: 'id',
+                summarySectionTitle: 'id',
+                summarySectionSubtitle: 'id',
+                summaryCard1Title: 'id',
+                summaryCard1Text: 'id',
+                summaryCard2Title: 'id',
+                summaryCard2Text: 'id',
+                strengthsSectionTitle: 'id',
+                strengthsSectionSubtitle: 'id',
+                strengthCard1Title: 'id',
+                strengthCard1Quote: 'id',
+                strengthCard2Title: 'id',
+                strengthCard2Quote: 'id',
+                strengthCard3Title: 'id',
+                strengthCard3Text: 'id',
+                improvementsSectionTitle: 'id',
+                improvementsSectionSubtitle: 'id',
+                improvementsChartTitle: 'id',
+                improvementsDetailedAnalysisTitle: 'id',
+                tabBtnPerformance: 'id',
+                tabBtnIntegrations: 'id',
+                tabBtnSupport: 'id',
+                performanceTabTitle: 'id',
+                performanceTabText: 'id',
+                performanceTabLi1: 'id',
+                performanceTabLi2: 'id',
+                performanceTabQuote: 'id',
+                integrationsTabTitle: 'id',
+                integrationsTabText: 'id',
+                integrationsTabLi1: 'id',
+                integrationsTabLi2: 'id',
+                integrationsTabQuote: 'id',
+                supportTabTitle: 'id',
+                supportTabText: 'id',
+                supportTabLi1: 'id',
+                supportTabLi2: 'id',
+                supportTabQuote: 'id',
+                recommendationsSectionTitle: 'id',
+                recommendationsSectionSubtitle: 'id',
+                recCard1Title: 'id',
+                recCard1Li1: 'id',
+                recCard1Li2: 'id',
+                recCard1Li3: 'id',
+                recCard2Title: 'id',
+                recCard2Li1: 'id',
+                recCard2Li2: 'id',
+                recCard2Li3: 'id',
+                recCard3Title: 'id',
+                recCard3Li1: 'id',
+                recCard3Li2: 'id',
+                recCard3Li3: 'id',
+                footerText: 'id'
+            };
+
+            for (const key in elementsToTranslate) {
+                const type = elementsToTranslate[key];
+                let element;
+                if (type === 'id') {
+                    element = document.getElementById(key);
+                } else if (type === 'data-translate') {
+                    element = document.querySelector(`[data-translate="${key}"]`);
+                }
+                
+                if (element && translations[lang] && translations[lang][key]) {
+                    element.innerHTML = translations[lang][key];
+                }
+            }
+            updateChartLabels(lang);
+            document.documentElement.lang = lang; // Met à jour l'attribut lang de la balise HTML
+        }
+
+        // Événement déclenché lorsque le DOM est entièrement chargé
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // Données pour le graphique en anneau de satisfaction
+            const satisfactionData = {
+                labels: [], // Sera défini par la traduction
+                datasets: [{
+                    label: '', // Sera défini par la traduction
+                    data: [60, 20, 10, 10],
+                    backgroundColor: [
+                        chartColors.verySatisfied,
+                        chartColors.satisfied,
+                        chartColors.neutral,
+                        chartColors.dissatisfied
+                    ],
+                    borderColor: '#E1E3F5', /* Content On-brand Quiet */
+                    borderWidth: 4,
+                    hoverOffset: 4
+                }]
+            };
+
+            // Données pour le graphique à barres des points forts
+            const strengthsData = {
+                labels: [], // Sera défini par la traduction
+                datasets: [
+                    {
+                        label: '', // Sera défini par la traduction
+                        data: [70, 20, 5, 5],
+                        backgroundColor: chartColors.verySatisfied,
+                    },
+                    {
+                        label: '', // Sera défini par la traduction
+                        data: [50, 30, 15, 5],
+                        backgroundColor: chartColors.satisfied,
+                    },
+                     {
+                        label: '', // Sera défini par la traduction
+                        data: [50, 30, 15, 5],
+                        backgroundColor: chartColors.neutral,
+                    }
+                ]
+            };
+
+            // Données pour le graphique à barres horizontales des améliorations
+            const improvementsData = {
+                labels: [], // Sera défini par la traduction
+                datasets: [{
+                    label: '', // Sera défini par la traduction
+                    data: [45, 30, 25],
+                    backgroundColor: [
+                        chartColors.performance,
+                        chartColors.integrations,
+                        chartColors.support
+                    ],
+                    borderColor: [
+                        chartColors.performance,
+                        chartColors.integrations,
+                        chartColors.support
+                    ],
+                    borderWidth: 1
+                }]
+            };
+
+            // Initialisation du graphique en anneau
+            satisfactionDonutChartInstance = new Chart(document.getElementById('satisfactionDonutChart'), {
+                type: 'doughnut',
+                data: satisfactionData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' },
+                        tooltip: { callbacks: { label: (context) => `${context.label}: ${context.raw}%` } }
+                    },
+                    cutout: '60%'
+                }
+            });
+
+            // Initialisation du graphique à barres des points forts
+            strengthsBarChartInstance = new Chart(document.getElementById('strengthsBarChart'), {
+                type: 'bar',
+                data: strengthsData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { stacked: true },
+                        y: { stacked: true, beginAtZero: true, max: 100 }
+                    },
+                    plugins: {
+                        legend: { position: 'bottom' },
+                        tooltip: { mode: 'index', intersect: false, callbacks: { label: (context) => `${context.dataset.label}: ${context.raw}%` } }
+                    }
+                }
+            });
+
+            // Initialisation du graphique à barres horizontales des améliorations
+            improvementsHorizontalBarChartInstance = new Chart(document.getElementById('improvementsHorizontalBarChart'), {
+                type: 'bar',
+                data: improvementsData,
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { callbacks: { label: (context) => `${context.raw}% ${translations[document.documentElement.lang].chartImprovementsDatasetLabel.toLowerCase().split(' ').slice(1).join(' ')}` } }
+                    },
+                    scales: {
+                        x: { beginAtZero: true, max: 50 }
+                    }
+                }
+            });
+
+            // Logique des onglets pour la section des améliorations
+            const tabs = document.querySelectorAll('.tab-btn');
+            const contents = {
+                performance: document.getElementById('performance-content'),
+                integrations: document.getElementById('integrations-content'),
+                support: document.getElementById('support-content')
+            };
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    tabs.forEach(item => item.classList.remove('active'));
+                    tab.classList.add('active');
+                    
+                    Object.values(contents).forEach(content => content.classList.add('hidden'));
+                    contents[tab.dataset.tab].classList.remove('hidden');
+                });
+            });
+
+            // Logique de surbrillance des liens de navigation en fonction du défilement
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('main section');
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        navLinks.forEach(link => {
+                            link.classList.toggle('active', link.getAttribute('href').substring(1) === entry.target.id);
+                        });
+                    }
+                });
+            }, { rootMargin: "-50% 0px -50% 0px" }); // Ajuste le seuil pour une meilleure détection
+
+            sections.forEach(section => {
+                observer.observe(section);
+            });
+
+            // Gestionnaire d'événements pour le sélecteur de langue
+            const languageSelector = document.getElementById('language-selector');
+            languageSelector.addEventListener('change', (event) => {
+                translatePage(event.target.value);
+            });
+
+            // Définit la langue par défaut sur l'anglais au chargement de la page
+            languageSelector.value = 'en';
+            translatePage('en');
+        });
+    </script>
+</body>
+</html>
