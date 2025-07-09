@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title data-key="pageTitle">Analyse Encaissement | S1 2025</title>
 
+    <!-- Dépendances -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet" />
@@ -44,6 +45,7 @@
 </head>
 <body class="antialiased">
 
+    <!-- Header -->
     <header class="sticky top-0 z-50 py-4" style="background: rgba(28, 40, 65, 0.8); backdrop-filter: blur(15px);">
         <nav class="container mx-auto px-6 flex justify-between items-center">
             <div class="flex items-center space-x-3">
@@ -63,64 +65,428 @@
         </nav>
     </header>
 
+    <!-- Main Content -->
     <main class="container mx-auto px-6 py-12">
 
-        <section class="text-center mb-16 fade-in">
+        <!-- Hero Section -->
+        <section class="text-center mb-12 fade-in">
             <h2 class="text-4xl md:text-6xl font-bold text-white" data-key="heroTitle">Feedback Utilisateurs S1 2025</h2>
             <p class="text-lg md:text-xl text-indigo-200 mt-4 max-w-3xl mx-auto" data-key="heroSubtitle">
                 Analyse des systèmes d'encaissement WebPOS Fixe et Mobile pour la France.
             </p>
         </section>
 
+        <!-- Seniority & Key Figures -->
         <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
             <div class="glass-card p-6 rounded-2xl fade-in" style="animation-delay: 100ms;">
-                <p class="text-sm font-medium text-indigo-200" data-key="card1Title">Répondants</p>
-                <p class="text-3xl font-bold text-white mt-1">74</p>
+                <p class="text-sm font-medium text-indigo-200" data-key="card1Title">Ancienneté Moyenne</p>
+                <p class="text-3xl font-bold text-white mt-1">3.8 <span class="text-lg" data-key="years">ans</span></p>
             </div>
             <div class="glass-card p-6 rounded-2xl fade-in" style="animation-delay: 200ms;">
-                <p class="text-sm font-medium text-indigo-200" data-key="card2Title">Adoption Mobile</p>
-                <p class="text-3xl font-bold text-white mt-1">30%</p>
+                <p class="text-sm font-medium text-indigo-200" data-key="card2Title">Ancienneté Médiane</p>
+                <p class="text-3xl font-bold text-white mt-1">4 <span class="text-lg" data-key="years">ans</span></p>
             </div>
             <div class="glass-card p-6 rounded-2xl fade-in" style="animation-delay: 300ms;">
-                <p class="text-sm font-medium text-indigo-200" data-key="card3Title">Point Fort N°1</p>
-                <p class="text-3xl font-bold text-white mt-1" data-key="card3Value">Simplicité</p>
+                <p class="text-sm font-medium text-indigo-200" data-key="card3Title">Répondants</p>
+                <p class="text-3xl font-bold text-white mt-1">74</p>
             </div>
             <div class="glass-card p-6 rounded-2xl fade-in" style="animation-delay: 400ms;">
-                <p class="text-sm font-medium text-indigo-200" data-key="card4Title">Point Faible N°1</p>
-                <p class="text-3xl font-bold text-white mt-1" data-key="card4Value">Lenteur</p>
+                <p class="text-sm font-medium text-indigo-200" data-key="card4Title">Adoption Mobile</p>
+                <p class="text-3xl font-bold text-white mt-1">30%</p>
             </div>
         </section>
 
+        <!-- WebPOS Fixed Analysis -->
         <section class="mb-16 fade-in" style="animation-delay: 500ms;">
-            <h3 class="text-3xl font-bold text-white mb-6 flex items-center"><i class="ri-computer-line mr-4 text-cyan-400"></i><span data-key="webposFixedTitle">WebPOS Caisse Fixe</span></h3>
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <div class="glass-card p-6 rounded-2xl">
-                    <h4 class="text-xl font-semibold text-green-400 mb-4" data-key="strengthsTitle">Points Forts</h4>
-                    <ul class="space-y-3 list-inside">
-                        <li class="flex items-start"><i class="ri-check-double-line mr-2 text-green-400 mt-1"></i><span data-key="fixedStrength1"><b>Simplicité et Intuitivité :</b> Universellement reconnu comme facile à prendre en main pour les nouveaux collaborateurs.</span></li>
-                        <li class="flex items-start"><i class="ri-check-double-line mr-2 text-green-400 mt-1"></i><span data-key="fixedStrength2"><b>Rapidité des tâches de base :</b> Le scan et le paiement sont considérés comme rapides et efficaces.</span></li>
-                    </ul>
+            <h3 class="text-3xl font-bold text-white mb-8 flex items-center"><i class="ri-computer-line mr-4 text-cyan-400"></i><span data-key="webposFixedTitle">WebPOS Caisse Fixe</span></h3>
+            <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
+                <div class="lg:col-span-3 glass-card p-6 rounded-2xl">
+                    <h4 class="text-xl font-semibold text-indigo-200 mb-4" data-key="chartFixedTitle">Thèmes les plus mentionnés</h4>
+                    <div class="h-80">
+                        <canvas id="fixedPosChart"></canvas>
+                    </div>
                 </div>
-                 <div class="glass-card p-6 rounded-2xl">
-                    <h4 class="text-xl font-semibold text-red-400 mb-4" data-key="weaknessesTitle">Points Faibles</h4>
-                    <ul class="space-y-3 list-inside">
-                        <li class="flex items-start"><i class="ri-close-circle-line mr-2 text-red-400 mt-1"></i><span data-key="fixedWeakness1"><b>Lenteur et Freezes :</b> Le problème le plus critique, surtout lors des pics d'affluence et des recherches clients/tickets.</span></li>
-                        <li class="flex items-start"><i class="ri-close-circle-line mr-2 text-red-400 mt-1"></i><span data-key="fixedWeakness2"><b>Bugs sur les périphériques :</b> Problèmes récurrents avec les imprimantes et les terminaux de paiement.</span></li>
-                    </ul>
-                </div>
-                <div class="lg:col-span-2 glass-card p-6 rounded-2xl">
-                    <h4 class="text-xl font-semibold text-indigo-200 mb-4" data-key="voiceOfTheUserTitle">Voix de l'Utilisateur</h4>
-                    <blockquote class="border-l-4 border-cyan-400 pl-4 italic text-white/90">
-                        <p data-key="fixedQuote1">"Le plus gros point faible c'est sa lenteur, il y a des moments où il faut attendre de longues secondes avant qu'il réagisse."</p>
-                    </blockquote>
+                <div class="lg:col-span-2 space-y-6">
+                    <div class="glass-card p-6 rounded-2xl">
+                        <h4 class="text-xl font-semibold text-green-400 mb-3" data-key="strengthsTitle">Points Forts</h4>
+                        <blockquote class="text-white/90">
+                            <p data-key="fixedQuoteStrength">"Facile d'utilisation, tout est clair et bien expliqué, pas besoin d'une grosse formation pour l'utiliser."</p>
+                            <footer class="text-sm text-indigo-300 mt-2" data-key="fixedAuthorStrength">— Anthony, Vendeur / Vendeuse Sportif.ve</footer>
+                        </blockquote>
+                    </div>
+                    <div class="glass-card p-6 rounded-2xl">
+                        <h4 class="text-xl font-semibold text-red-400 mb-3" data-key="weaknessesTitle">Points Faibles</h4>
+                        <blockquote class="text-white/90">
+                             <p data-key="fixedQuoteWeakness">"Le plus gros point faible c'est sa lenteur, il y a des moments où il faut attendre de longues secondes avant qu'il réagisse."</p>
+                            <footer class="text-sm text-indigo-300 mt-2" data-key="fixedAuthorWeakness">— Gaetan, Vendeur / Vendeuse Sportif.ve</footer>
+                        </blockquote>
+                    </div>
                 </div>
             </div>
         </section>
 
+        <!-- WebPOS Mobile Analysis -->
         <section class="mb-16 fade-in" style="animation-delay: 600ms;">
-            <h3 class="text-3xl font-bold text-white mb-6 flex items-center"><i class="ri-smartphone-line mr-4 text-cyan-400"></i><span data-key="webposMobileTitle">WebPOS Mobile</span></h3>
+            <h3 class="text-3xl font-bold text-white mb-8 flex items-center"><i class="ri-smartphone-line mr-4 text-cyan-400"></i><span data-key="webposMobileTitle">WebPOS Mobile</span></h3>
+            <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
+                <div class="lg:col-span-3 glass-card p-6 rounded-2xl">
+                    <h4 class="text-xl font-semibold text-indigo-200 mb-4" data-key="chartMobileTitle">Thèmes les plus mentionnés</h4>
+                    <div class="h-80">
+                        <canvas id="mobilePosChart"></canvas>
+                    </div>
+                </div>
+                 <div class="lg:col-span-2 space-y-6">
+                    <div class="glass-card p-6 rounded-2xl">
+                        <h4 class="text-xl font-semibold text-green-400 mb-3" data-key="strengthsTitle">Points Forts</h4>
+                        <blockquote class="text-white/90">
+                            <p data-key="mobileQuoteStrength">"La mobilité et la possibilité d'aller voir le client directement en rayon. Parfait pour désengorger les caisses en période de forte affluence."</p>
+                            <footer class="text-sm text-indigo-300 mt-2" data-key="mobileAuthorStrength">— Pierre, Responsable de Rayon / Leader Métier</footer>
+                        </blockquote>
+                    </div>
+                    <div class="glass-card p-6 rounded-2xl">
+                        <h4 class="text-xl font-semibold text-red-400 mb-3" data-key="weaknessesTitle">Points Faibles</h4>
+                        <blockquote class="text-white/90">
+                             <p data-key="mobileQuoteWeakness">"Le plus gros point faible est le manque de fonctionnalités... impossible de faire des retours ou des reprises."</p>
+                            <footer class="text-sm text-indigo-300 mt-2" data-key="mobileAuthorWeakness">— Manon, Vendeur / Vendeuse Sportif.ve</footer>
+                        </blockquote>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Recommendations Section -->
+        <section class="fade-in" style="animation-delay: 700ms;">
+            <h3 class="text-3xl font-bold text-white mb-8 text-center" data-key="recommendationsTitle">Recommandations Stratégiques</h3>
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <div class="glass-card p-6 rounded-2xl">
-                    <h4 class="text-xl font-semibold text-green-400 mb-4" data-key="strengthsTitle">Points Forts</h4>
-                    <ul class="space-y-3 list-inside">
-                        <li class="flex items-start"><i class="ri-check-double-line
+                <div class="glass-card p-8 rounded-2xl">
+                    <h4 class="text-2xl font-semibold text-cyan-400 mb-4" data-key="webposFixedTitle">WebPOS Caisse Fixe</h4>
+                    <ul class="space-y-3 list-disc list-inside">
+                        <li data-key="fixedReco1"><b>Prioriser la Performance :</b> Lancer un audit technique axé sur l'optimisation des requêtes et la résolution des bugs causant des freezes.</li>
+                        <li data-key="fixedReco2"><b>Fiabiliser les Périphériques :</b> Mettre en place un programme de certification et de test pour le matériel à chaque nouvelle version logicielle.</li>
+                        <li data-key="fixedReco3"><b>Améliorer les Tâches Complexes :</b> Repenser le parcours utilisateur pour les 3 tâches complexes les plus citées (retours, recherche client, etc.).</li>
+                    </ul>
+                </div>
+                <div class="glass-card p-8 rounded-2xl">
+                    <h4 class="text-2xl font-semibold text-cyan-400 mb-4" data-key="webposMobileTitle">WebPOS Mobile</h4>
+                     <ul class="space-y-3 list-disc list-inside">
+                        <li data-key="mobileReco1"><b>Résoudre la Connectivité d'Abord :</b> Déployer des audits Wi-Fi en magasin pour garantir une couverture totale. C'est un prérequis au succès.</li>
+                        <li data-key="mobileReco2"><b>Établir une Feuille de Route Fonctionnelle :</b> Définir et communiquer un plan clair pour ajouter les 5 fonctionnalités manquantes les plus critiques.</li>
+                        <li data-key="mobileReco3"><b>Optimiser le Matériel :</b> Évaluer des appareils avec une meilleure autonomie et des scanners plus robustes pour le prochain cycle de renouvellement.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-center py-8 mt-12 border-t border-white/10">
+        <p class="text-indigo-300 text-sm" data-key="footerText">&copy; 2025 Decathlon. Analyse interne.</p>
+    </footer>
+
+    <!-- JavaScript Logic -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            const translations = {
+                fr: {
+                    pageTitle: "Analyse Encaissement | S1 2025",
+                    headerTitle: "Analyse Encaissement",
+                    heroTitle: "Feedback Utilisateurs S1 2025",
+                    heroSubtitle: "Analyse des systèmes d'encaissement WebPOS Fixe et Mobile pour la France.",
+                    card1Title: "Ancienneté Moyenne",
+                    card2Title: "Ancienneté Médiane",
+                    years: "ans",
+                    card3Title: "Répondants",
+                    card4Title: "Adoption Mobile",
+                    webposFixedTitle: "WebPOS Caisse Fixe",
+                    strengthsTitle: "Points Forts",
+                    weaknessesTitle: "Points Faibles",
+                    chartFixedTitle: "Thèmes les plus mentionnés (Fixe)",
+                    fixedQuoteStrength: `"Facile d'utilisation, tout est clair et bien expliqué, pas besoin d'une grosse formation pour l'utiliser."`,
+                    fixedAuthorStrength: "— Anthony, Vendeur / Vendeuse Sportif.ve",
+                    fixedQuoteWeakness: `"Le plus gros point faible c'est sa lenteur, il y a des moments où il faut attendre de longues secondes avant qu'il réagisse."`,
+                    fixedAuthorWeakness: "— Gaetan, Vendeur / Vendeuse Sportif.ve",
+                    webposMobileTitle: "WebPOS Mobile",
+                    chartMobileTitle: "Thèmes les plus mentionnés (Mobile)",
+                    mobileQuoteStrength: `"La mobilité et la possibilité d'aller voir le client directement en rayon. Parfait pour désengorger les caisses en période de forte affluence."`,
+                    mobileAuthorStrength: "— Pierre, Responsable de Rayon / Leader Métier",
+                    mobileQuoteWeakness: `"Le plus gros point faible est le manque de fonctionnalités... impossible de faire des retours ou des reprises."`,
+                    mobileAuthorWeakness: "— Manon, Vendeur / Vendeuse Sportif.ve",
+                    recommendationsTitle: "Recommandations Stratégiques",
+                    fixedReco1: "<b>Prioriser la Performance :</b> Lancer un audit technique axé sur l'optimisation des requêtes et la résolution des bugs causant des freezes.",
+                    fixedReco2: "<b>Fiabiliser les Périphériques :</b> Mettre en place un programme de certification et de test pour le matériel à chaque nouvelle version logicielle.",
+                    fixedReco3: "<b>Améliorer les Tâches Complexes :</b> Repenser le parcours utilisateur pour les 3 tâches complexes les plus citées (retours, recherche client, etc.).",
+                    mobileReco1: "<b>Résoudre la Connectivité d'Abord :</b> Déployer des audits Wi-Fi en magasin pour garantir une couverture totale. C'est un prérequis au succès.",
+                    mobileReco2: "<b>Établir une Feuille de Route Fonctionnelle :</b> Définir et communiquer un plan clair pour ajouter les 5 fonctionnalités manquantes les plus critiques.",
+                    mobileReco3: "<b>Optimiser le Matériel :</b> Évaluer des appareils avec une meilleure autonomie et des scanners plus robustes pour le prochain cycle de renouvellement.",
+                    footerText: "&copy; 2025 Decathlon. Analyse interne.",
+                    chartPositive: "Positif",
+                    chartNegative: "Négatif",
+                    themeSimplicity: "Simplicité",
+                    themePerformance: "Performance/Lenteur",
+                    themeBugs: "Bugs/Stabilité",
+                    themeFeatures: "Fonctionnalités",
+                    themeConnectivity: "Connectivité",
+                },
+                en: {
+                    pageTitle: "Checkout Analysis | H1 2025",
+                    headerTitle: "Checkout Analysis",
+                    heroTitle: "User Feedback H1 2025",
+                    heroSubtitle: "Analysis of WebPOS Fixed and Mobile checkout systems for France.",
+                    card1Title: "Average Seniority",
+                    card2Title: "Median Seniority",
+                    years: "years",
+                    card3Title: "Respondents",
+                    card4Title: "Mobile Adoption",
+                    webposFixedTitle: "WebPOS Fixed POS",
+                    strengthsTitle: "Strengths",
+                    weaknessesTitle: "Weaknesses",
+                    chartFixedTitle: "Most Mentioned Themes (Fixed)",
+                    fixedQuoteStrength: `"Easy to use, everything is clear and well-explained, you don't need a lot of training to use it."`,
+                    fixedAuthorStrength: "— Anthony, Sporting Sales Assistant",
+                    fixedQuoteWeakness: `"The biggest weak point is its slowness; there are times when you have to wait long seconds for it to react."`,
+                    fixedAuthorWeakness: "— Gaetan, Sporting Sales Assistant",
+                    webposMobileTitle: "WebPOS Mobile",
+                    chartMobileTitle: "Most Mentioned Themes (Mobile)",
+                    mobileQuoteStrength: `"Mobility and the ability to go directly to the customer in the aisle. Perfect for relieving the main checkouts during busy periods."`,
+                    mobileAuthorStrength: "— Pierre, Department Manager / Business Leader",
+                    mobileQuoteWeakness: `"The biggest weakness is the lack of features... impossible to process returns or exchanges."`,
+                    mobileAuthorWeakness: "— Manon, Sporting Sales Assistant",
+                    recommendationsTitle: "Strategic Recommendations",
+                    fixedReco1: "<b>Prioritize Performance:</b> Launch a technical audit focused on query optimization and fixing bugs that cause freezes.",
+                    fixedReco2: "<b>Improve Peripheral Reliability:</b> Implement a hardware certification and testing program for each new software release.",
+                    fixedReco3: "<b>Enhance Complex Workflows:</b> Redesign the UX for the top 3 most-cited complex tasks (returns, customer search, etc.).",
+                    mobileReco1: "<b>Solve Connectivity First:</b> Deploy Wi-Fi audits in stores to ensure full coverage. This is a prerequisite for success.",
+                    mobileReco2: "<b>Establish a Feature Roadmap:</b> Define and communicate a clear plan to add the top 5 most critical missing features.",
+                    mobileReco3: "<b>Optimize Hardware:</b> Evaluate devices with better battery life and more robust scanners for the next refresh cycle.",
+                    footerText: "&copy; 2025 Decathlon. Internal analysis.",
+                    chartPositive: "Positive",
+                    chartNegative: "Negative",
+                    themeSimplicity: "Simplicity",
+                    themePerformance: "Performance/Slowness",
+                    themeBugs: "Bugs/Stability",
+                    themeFeatures: "Features",
+                    themeConnectivity: "Connectivity",
+                },
+                pt: { // Traduction Portugaise
+                    pageTitle: "Análise de Caixa | S1 2025",
+                    headerTitle: "Análise de Caixa",
+                    heroTitle: "Feedback do Utilizador S1 2025",
+                    heroSubtitle: "Análise dos sistemas de caixa WebPOS Fixo e Móvel para a França.",
+                    card1Title: "Antiguidade Média",
+                    card2Title: "Antiguidade Mediana",
+                    years: "anos",
+                    card3Title: "Inquiridos",
+                    card4Title: "Adoção Móvel",
+                    webposFixedTitle: "WebPOS Caixa Fixo",
+                    strengthsTitle: "Pontos Fortes",
+                    weaknessesTitle: "Pontos Fracos",
+                    chartFixedTitle: "Temas Mais Mencionados (Fixo)",
+                    fixedQuoteStrength: `"Fácil de usar, tudo é claro e bem explicado, não é preciso muita formação para o utilizar."`,
+                    fixedAuthorStrength: "— Anthony, Vendedor Desportivo",
+                    fixedQuoteWeakness: `"O maior ponto fraco é a sua lentidão, há momentos em que é preciso esperar longos segundos para que reaja."`,
+                    fixedAuthorWeakness: "— Gaetan, Vendedor Desportivo",
+                    webposMobileTitle: "WebPOS Móvel",
+                    chartMobileTitle: "Temas Mais Mencionados (Móvel)",
+                    mobileQuoteStrength: `"A mobilidade e a possibilidade de ir ter com o cliente diretamente no corredor. Perfeito para aliviar as caixas em períodos de grande afluência."`,
+                    mobileAuthorStrength: "— Pierre, Gerente de Departamento / Líder de Negócios",
+                    mobileQuoteWeakness: `"O maior ponto fraco é a falta de funcionalidades... impossível processar devoluções ou trocas."`,
+                    mobileAuthorWeakness: "— Manon, Vendedora Desportiva",
+                    recommendationsTitle: "Recomendações Estratégicas",
+                    fixedReco1: "<b>Priorizar o Desempenho:</b> Lançar uma auditoria técnica focada na otimização de consultas e na correção de bugs que causam congelamentos.",
+                    fixedReco2: "<b>Fiabilidade dos Periféricos:</b> Implementar um programa de certificação e teste para o hardware a cada nova versão de software.",
+                    fixedReco3: "<b>Melhorar Tarefas Complexas:</b> Redesenhar a experiência do utilizador para as 3 tarefas complexas mais citadas (devoluções, pesquisa de cliente, etc.).",
+                    mobileReco1: "<b>Resolver a Conectividade Primeiro:</b> Realizar auditorias de Wi-Fi nas lojas para garantir cobertura total. Isto é um pré-requisito para o sucesso.",
+                    mobileReco2: "<b>Estabelecer um Roteiro de Funcionalidades:</b> Definir e comunicar um plano claro para adicionar as 5 funcionalidades em falta mais críticas.",
+                    mobileReco3: "<b>Otimizar o Hardware:</b> Avaliar dispositivos com melhor autonomia de bateria e scanners mais robustos para o próximo ciclo de renovação.",
+                    footerText: "&copy; 2025 Decathlon. Análise interna.",
+                    chartPositive: "Positivo",
+                    chartNegative: "Negativo",
+                    themeSimplicity: "Simplicidade",
+                    themePerformance: "Desempenho/Lentidão",
+                    themeBugs: "Bugs/Estabilidade",
+                    themeFeatures: "Funcionalidades",
+                    themeConnectivity: "Conectividade",
+                },
+                bg: { // Traduction Bulgare
+                    pageTitle: "Анализ на каси | П1 2025",
+                    headerTitle: "Анализ на каси",
+                    heroTitle: "Обратна връзка от потребители П1 2025",
+                    heroSubtitle: "Анализ на касовите системи WebPOS стационарни и мобилни за Франция.",
+                    card1Title: "Среден стаж",
+                    card2Title: "Медианен стаж",
+                    years: "години",
+                    card3Title: "Респонденти",
+                    card4Title: "Мобилно приемане",
+                    webposFixedTitle: "WebPOS стационарна каса",
+                    strengthsTitle: "Силни страни",
+                    weaknessesTitle: "Слаби страни",
+                    chartFixedTitle: "Най-споменавани теми (стационарна)",
+                    fixedQuoteStrength: `"Лесен за използване, всичко е ясно и добре обяснено, не е необходима голяма подготовка, за да го използвате."`,
+                    fixedAuthorStrength: "— Anthony, Спортен консултант-продавач",
+                    fixedQuoteWeakness: `"Най-големият недостатък е неговата бавност, има моменти, в които трябва да чакате дълги секунди, за да реагира."`,
+                    fixedAuthorWeakness: "— Gaetan, Спортен консултант-продавач",
+                    webposMobileTitle: "WebPOS мобилен",
+                    chartMobileTitle: "Най-споменавани теми (мобилна)",
+                    mobileQuoteStrength: `"Мобилността и възможността да отидете директно при клиента в отдела. Перфектно за облекчаване на касите в натоварени периоди."`,
+                    mobileAuthorStrength: "— Pierre, Мениджър отдел / Бизнес лидер",
+                    mobileQuoteWeakness: `"Най-големият недостатък е липсата на функции... невъзможно е да се обработват връщания или замени."`,
+                    mobileAuthorWeakness: "— Manon, Спортен консултант-продавач",
+                    recommendationsTitle: "Стратегически препоръки",
+                    fixedReco1: "<b>Приоритет на производителността:</b> Стартирайте технически одит, фокусиран върху оптимизиране на заявките и отстраняване на бъгове, които причиняват замръзвания.",
+                    fixedReco2: "<b>Надеждност на периферията:</b> Внедрете програма за сертифициране и тестване на хардуера за всяка нова версия на софтуера.",
+                    fixedReco3: "<b>Подобряване на сложни задачи:</b> Преработете потребителското изживяване за 3-те най-цитирани сложни задачи (връщания, търсене на клиенти и др.).",
+                    mobileReco1: "<b>Първо решете свързаността:</b> Извършете Wi-Fi одити в магазините, за да осигурите пълно покритие. Това е предпоставка за успех.",
+                    mobileReco2: "<b>Създайте пътна карта на функциите:</b> Определете и съобщете ясен план за добавяне на 5-те най-критични липсващи функции.",
+                    mobileReco3: "<b>Оптимизирайте хардуера:</b> Оценете устройства с по-добър живот на батерията и по-здрави скенери за следващия цикъл на обновяване.",
+                    footerText: "&copy; 2025 Decathlon. Вътрешен анализ.",
+                    chartPositive: "Положителен",
+                    chartNegative: "Отрицателен",
+                    themeSimplicity: "Простота",
+                    themePerformance: "Производителност/Бавност",
+                    themeBugs: "Бъгове/Стабилност",
+                    themeFeatures: "Функции",
+                    themeConnectivity: "Свързаност",
+                },
+                ro: { // Traduction Roumaine
+                    pageTitle: "Analiză Case de Marcat | S1 2025",
+                    headerTitle: "Analiză Case de Marcat",
+                    heroTitle: "Feedback Utilizatori S1 2025",
+                    heroSubtitle: "Analiza sistemelor de case de marcat WebPOS Fix și Mobil pentru Franța.",
+                    card1Title: "Vechime Medie",
+                    card2Title: "Vechime Mediană",
+                    years: "ani",
+                    card3Title: "Respondenți",
+                    card4Title: "Adopție Mobilă",
+                    webposFixedTitle: "WebPOS Casă Fixă",
+                    strengthsTitle: "Puncte Forte",
+                    weaknessesTitle: "Puncte Slabe",
+                    chartFixedTitle: "Cele mai menționate teme (Fix)",
+                    fixedQuoteStrength: `"Ușor de utilizat, totul este clar și bine explicat, nu este nevoie de multă pregătire pentru a-l folosi."`,
+                    fixedAuthorStrength: "— Anthony, Asistent Vânzări Sportiv",
+                    fixedQuoteWeakness: `"Cel mai mare punct slab este încetineala sa, sunt momente în care trebuie să aștepți secunde lungi pentru ca acesta să reacționeze."`,
+                    fixedAuthorWeakness: "— Gaetan, Asistent Vânzări Sportiv",
+                    webposMobileTitle: "WebPOS Mobil",
+                    chartMobileTitle: "Cele mai menționate teme (Mobil)",
+                    mobileQuoteStrength: `"Mobilitatea și posibilitatea de a merge direct la client pe raion. Perfect pentru a degaja casele în perioadele aglomerate."`,
+                    mobileAuthorStrength: "— Pierre, Manager de Departament / Lider de Afaceri",
+                    mobileQuoteWeakness: `"Cel mai mare punct slab este lipsa de funcționalități... imposibil de procesat retururi sau schimburi."`,
+                    mobileAuthorWeakness: "— Manon, Asistent Vânzări Sportiv",
+                    recommendationsTitle: "Recomandări Strategice",
+                    fixedReco1: "<b>Prioritizarea Performanței:</b> Lansați un audit tehnic axat pe optimizarea interogărilor și remedierea bug-urilor care cauzează blocări.",
+                    fixedReco2: "<b>Fiabilitatea Perifericelor:</b> Implementați un program de certificare și testare pentru hardware la fiecare nouă versiune de software.",
+                    fixedReco3: "<b>Îmbunătățirea Sarcinilor Complexe:</b> Regândiți experiența utilizatorului pentru cele mai citate 3 sarcini complexe (retururi, căutare client, etc.).",
+                    mobileReco1: "<b>Rezolvați Conectivitatea Mai Întâi:</b> Efectuați audituri Wi-Fi în magazine pentru a asigura o acoperire completă. Aceasta este o precondiție pentru succes.",
+                    mobileReco2: "<b>Stabiliți o Foaie de Parcurs a Funcționalităților:</b> Definiți și comunicați un plan clar pentru a adăuga cele mai critice 5 funcționalități lipsă.",
+                    mobileReco3: "<b>Optimizați Hardware-ul:</b> Evaluați dispozitive cu o durată de viață mai bună a bateriei și scanere mai robuste pentru următorul ciclu de reînnoire.",
+                    footerText: "&copy; 2025 Decathlon. Analiză internă.",
+                    chartPositive: "Pozitiv",
+                    chartNegative: "Negativ",
+                    themeSimplicity: "Simplitate",
+                    themePerformance: "Performanță/Încetineală",
+                    themeBugs: "Bug-uri/Stabilitate",
+                    themeFeatures: "Funcționalități",
+                    themeConnectivity: "Conectivitate",
+                }
+            };
+
+            const languageSelector = document.getElementById('language-selector');
+            const translatePage = (lang) => {
+                document.documentElement.lang = lang;
+                document.querySelectorAll('[data-key]').forEach(element => {
+                    const key = element.dataset.key;
+                    if (translations[lang] && translations[lang][key]) {
+                        element.innerHTML = translations[lang][key];
+                    }
+                });
+                document.title = translations[lang].pageTitle;
+                updateChartLanguage(lang);
+            };
+            languageSelector.addEventListener('change', (event) => translatePage(event.target.value));
+
+            // --- CHART.JS LOGIC ---
+            const chartConfig = (lang, data, positiveColor, negativeColor) => ({
+                type: 'bar',
+                data: {
+                    labels: [translations[lang].themeSimplicity, translations[lang].themePerformance, translations[lang].themeBugs],
+                    datasets: [{
+                        label: translations[lang].chartPositive,
+                        data: data.positive,
+                        backgroundColor: positiveColor,
+                        borderRadius: 4,
+                    }, {
+                        label: translations[lang].chartNegative,
+                        data: data.negative,
+                        backgroundColor: negativeColor,
+                        borderRadius: 4,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    scales: {
+                        x: {
+                            stacked: true,
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                            ticks: { color: '#E0E0E0', callback: (value) => value + '%' }
+                        },
+                        y: {
+                            stacked: true,
+                            grid: { display: false },
+                            ticks: { color: '#E0E0E0', font: {size: 14} }
+                        }
+                    },
+                    plugins: {
+                        legend: { labels: { color: '#E0E0E0' } },
+                        tooltip: { callbacks: { label: (context) => `${context.dataset.label}: ${context.raw}%` } }
+                    }
+                }
+            });
+
+            const fixedChartCtx = document.getElementById('fixedPosChart').getContext('2d');
+            const mobileChartCtx = document.getElementById('mobilePosChart').getContext('2d');
+            let fixedChart, mobileChart;
+
+            const createOrUpdateCharts = (lang) => {
+                // Data from CSV analysis (percentage of users mentioning the theme)
+                const fixedData = { positive: [68, 0, 0], negative: [0, 55, 28] };
+                const mobileData = { positive: [52, 0, 0], negative: [0, 67, 48] }; // Themes: Simplicity, Features, Connectivity
+
+                if (fixedChart) fixedChart.destroy();
+                fixedChart = new Chart(fixedChartCtx, chartConfig(lang, fixedData, 'rgba(16, 185, 129, 0.6)', 'rgba(239, 68, 68, 0.6)'));
+                
+                // Adjust labels for mobile chart
+                const mobileConfig = chartConfig(lang, mobileData, 'rgba(16, 185, 129, 0.6)', 'rgba(239, 68, 68, 0.6)');
+                mobileConfig.data.labels = [translations[lang].themeSimplicity, translations[lang].themeFeatures, translations[lang].themeConnectivity];
+                
+                if (mobileChart) mobileChart.destroy();
+                mobileChart = new Chart(mobileChartCtx, mobileConfig);
+            };
+            
+            const updateChartLanguage = (lang) => {
+                if (!fixedChart || !mobileChart) return;
+                
+                // Update Fixed Chart
+                fixedChart.data.labels = [translations[lang].themeSimplicity, translations[lang].themePerformance, translations[lang].themeBugs];
+                fixedChart.data.datasets[0].label = translations[lang].chartPositive;
+                fixedChart.data.datasets[1].label = translations[lang].chartNegative;
+                fixedChart.update();
+
+                // Update Mobile Chart
+                mobileChart.data.labels = [translations[lang].themeSimplicity, translations[lang].themeFeatures, translations[lang].themeConnectivity];
+                mobileChart.data.datasets[0].label = translations[lang].chartPositive;
+                mobileChart.data.datasets[1].label = translations[lang].chartNegative;
+                mobileChart.update();
+            }
+
+            // --- INITIALIZATION ---
+            const defaultLang = navigator.language.split('-')[0] || 'fr';
+            languageSelector.value = translations[defaultLang] ? defaultLang : 'fr';
+            createOrUpdateCharts(languageSelector.value);
+            translatePage(languageSelector.value);
+        });
+    </script>
+</body>
+</html>
